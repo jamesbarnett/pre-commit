@@ -6,7 +6,9 @@ module PreCommit
     def self.call(quiet=false)
       dirs = ['features/'].reject {|d| !File.exists?(d)}
       check = new
-      check.staged_files = Utils.staged_files(*dirs)
+      check.staged_files = Utils.staged_files(*dirs).split(' ').select do |file|
+        file =~ /\.feature$/
+      end.join(" ")
 
       result = check.run
       if !quiet && !result
@@ -30,12 +32,20 @@ module PreCommit
     end
 
     def detected_bad_code?
-      !system("git diff --cached -Sdebugger --quiet --exit-code")
+      passed = true
+
+      staged_files.split(" ").each do |change|
+
+        diff = `git diff --cached -G @wip #{change}`
+        passed &&= !(diff =~ /[\s\W]@wip[\s\W]/)
+      end
+
+      !passed
     end
 
     def instances_of_cucumber_wip_tag_violations
       cmd = grep_command || "git grep"
-      `#{cmd} -nH '\b@wip\b' #{staged_files}`
+      `#{cmd} -nHw @wip #{staged_files}`
     end
 
     def print_dash_n_reminder

@@ -3,6 +3,7 @@ require 'pre-commit/utils'
 require 'pre-commit/checks/merge_conflict'
 require 'pre-commit/checks/tabs'
 require 'pre-commit/checks/console_log'
+require 'pre-commit/checks/cucumber_wip_check'
 require 'pre-commit/checks/debugger_check'
 require 'pre-commit/checks/local_check'
 require 'pre-commit/checks/jslint_check'
@@ -35,6 +36,7 @@ module PreCommit
     :js_lint_all             => JslintCheck.new(:all),
     :js_lint_new             => JslintCheck.new(:new),
     :jshint                  => JshintCheck.new,
+    :cucumber_wip            => CucumberWipCheck,
     :debugger                => DebuggerCheck,
     :pry                     => PryCheck,
     :local                   => LocalCheck,
